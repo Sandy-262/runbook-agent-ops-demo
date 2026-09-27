@@ -144,6 +144,41 @@ async function sendSlackApproval({ customer, day, slot, carrier, confidence, rea
   }
 }
 
+// Confirmation & Audit Route
+app.post('/api/appointment/confirm', async (req, res) => {
+  const { action, carrier, customer, slot } = req.body;
+  const isApproved = action === "approved";
+  const emoji = isApproved ? "✅" : "❌";
+  const statusText = isApproved ? "APPROVED" : "REJECTED";
+
+  // Structured Audit Log printed to Render Console
+  console.log(JSON.stringify({
+    event: "HUMAN_OPERATOR_DECISION",
+    timestamp: new Date().toISOString(),
+    decision: statusText,
+    facility: customer,
+    carrier: carrier,
+    slot: slot
+  }));
+
+  // Send resolution card to Slack
+  const url = process.env.SLACK_WEBHOOK_URL;
+  if (url && !url.includes("YOUR/WEBHOOK")) {
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `${emoji} *HUMAN OPERATOR RESOLUTION*\n*Status:* ${statusText}\n*Facility:* ${customer}\n*Carrier:* ${carrier}\n*Slot:* ${slot}\n*Resolved At:* ${new Date().toLocaleTimeString()}`
+        })
+      });
+    } catch (err) {
+      console.error("Slack webhook error:", err.message);
+    }
+  }
+
+  res.json({ success: true, decision: statusText });
+});
 const PORT = process.env.PORT || 3000;
 // Post-Approval Route
 app.post('/api/appointment/confirm', async (req, res) => {
