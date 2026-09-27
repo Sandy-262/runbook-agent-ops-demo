@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Appointment Operations Agent</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <p><a href="index.html">← Back to Operations Lab</a></p>
+    <div class="header">
+      <span class="badge">HERO DEMO</span>
+      <h1>Appointment Operations Agent</h1>
+      <p>Natural language request parsing, constraint validation, availability checking, and human-in-the-loop Slack escalation.</p>
+    </div>
+
+    <label><strong>Describe the operational appointment request:</strong></label>
+    <textarea id="requestInput" placeholder="e.g. Schedule a pickup for DHL Bangalore Tuesday between 10 AM and 2 PM. Carrier is ABC Logistics."></textarea>
+      
+    <div>
+      <button class="btn" id="runBtn" onclick="runAgent()">Run Agent</button>
+      <button class="btn btn-secondary" onclick="loadExample(1)">Example 1: Safe Booking</button>
+      <button class="btn btn-secondary" onclick="loadExample(2)">Example 2: Carrier Escalation</button>
+      <button class="btn btn-secondary" onclick="loadExample(3)">Example 3: Missing Info</button>
+    </div>
+
+    <div class="activity-panel" id="activityLog">[Agent Ready. Enter a request and click 'Run Agent']</div>
+
+    <div id="decisionArea" style="display:none;" class="decision-card">
+      <h3 id="decisionTitle">Decision Outcome</h3>
+      <p id="decisionBody"></p>
+      <div id="approvalActions" style="display:none;">
+        <button class="btn" style="background:#16a34a;" onclick="approveAction()">Approve Action</button>
+        <button class="btn" style="background:#dc2626;" onclick="rejectAction()">Reject Action</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/appointment.js"></script>
+</body>
+</html>

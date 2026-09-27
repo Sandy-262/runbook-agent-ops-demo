@@ -1,0 +1,85 @@
+body {  
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;  
+  background-color: #f8fafc;  
+  color: #1e293b;  
+  margin: 0;  
+  padding: 20px;  
+}  
+.container {  
+  max-width: 900px;  
+  margin: 0 auto;  
+  background: #ffffff;  
+  padding: 30px;  
+  border-radius: 8px;  
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);  
+}  
+.header {  
+  border-bottom: 2px solid #e2e8f0;  
+  padding-bottom: 16px;  
+  margin-bottom: 24px;  
+}  
+.badge {  
+  background: #e0f2fe;  
+  color: #0369a1;  
+  padding: 4px 8px;  
+  border-radius: 4px;  
+  font-size: 12px;  
+  font-weight: 600;  
+}  
+textarea {  
+  width: 100%;  
+  height: 110px;  
+  padding: 12px;  
+  border: 1px solid #cbd5e1;  
+  border-radius: 6px;  
+  font-size: 14px;  
+  box-sizing: border-box;  
+}  
+.btn {  
+  background: #2563eb;  
+  color: white;  
+  border: none;  
+  padding: 10px 20px;  
+  border-radius: 6px;  
+  font-size: 14px;  
+  font-weight: 600;  
+  cursor: pointer;  
+  margin-top: 10px;  
+}  
+.btn:hover { background: #1d4ed8; }  
+.btn-secondary {  
+  background: #e2e8f0;  
+  color: #334155;  
+  margin-left: 8px;  
+}  
+.btn-secondary:hover { background: #cbd5e1; }  
+.activity-panel {  
+  margin-top: 24px;  
+  background: #0f172a;  
+  color: #38bdf8;  
+  padding: 16px;  
+  border-radius: 6px;  
+  font-family: Consolas, monospace;  
+  font-size: 13px;  
+  min-height: 160px;  
+  white-space: pre-wrap;  
+}  
+.card-grid {  
+  display: grid;  
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  
+  gap: 20px;  
+  margin-top: 24px;  
+}  
+.agent-card {  
+  border: 1px solid #e2e8f0;  
+  padding: 20px;  
+  border-radius: 8px;  
+  background: #ffffff;  
+}  
+.decision-card {  
+  margin-top: 20px;  
+  border: 1px solid #e2e8f0;  
+  padding: 18px;  
+  border-radius: 6px;  
+  background: #f8fafc;  
+}

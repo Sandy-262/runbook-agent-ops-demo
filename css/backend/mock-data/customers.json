@@ -1,0 +1,4 @@
+[
+  { "id": "CUST-01", "name": "DHL Bangalore", "sla_hours": 24, "preferred_window": "morning" },
+  { "id": "CUST-02", "name": "BlueDart Chennai", "sla_hours": 48, "preferred_window": "afternoon" }
+]
