@@ -1,5 +1,5 @@
 // Once deployed on Render, update this URL to your actual Render domain:
-const BACKEND_URL = "https://YOUR_RENDER_SERVICE_NAME.onrender.com/api/appointment";
+const BACKEND_URL = "https://runbook-agent-backend.onrender.com/api/appointment";
 
 function loadExample(num) {
   const input = document.getElementById("requestInput");
