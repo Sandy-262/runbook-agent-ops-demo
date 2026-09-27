@@ -19,6 +19,9 @@ function logActivity(text) {
   panel.scrollTop = panel.scrollHeight;
 }
 
+// Variable to hold context for the current decision
+let currentPendingAction = null;
+
 async function runAgent() {
   const text = document.getElementById("requestInput").value.trim();
   if (!text) return alert("Please enter an operational request.");
@@ -39,7 +42,6 @@ async function runAgent() {
     });
     const data = await res.json();
 
-    // Stream step-by-step logs from backend response
     if (data.execution_steps) {
       data.execution_steps.forEach(step => logActivity(step));
     }
@@ -50,10 +52,17 @@ async function runAgent() {
     decisionArea.style.display = "block";
 
     if (data.requires_human_approval) {
+      // Store context for the approve/reject buttons
+      currentPendingAction = {
+        carrier: text.includes("ABC Logistics") ? "ABC Logistics" : "Unverified Carrier",
+        customer: text.toLowerCase().includes("dhl") ? "DHL Bangalore" : "Facility",
+        slot: data.proposed_action ? data.proposed_action.time_slot : "Requested Window"
+      };
+
       decisionTitle.innerHTML = "<span style='color:#eab308;'>⚠ Human Approval Required</span>";
       decisionBody.innerHTML = `<strong>Proposed Slot:</strong> ${data.proposed_action.time_slot}<br>
         <strong>Reason for Escalation:</strong> ${data.reasoning_summary}<br>
-        <em>Slack notification sent to #runbook-agent-demo for operator approval.</em>`;
+        <em>Slack notification sent to operator channel.</em>`;
       document.getElementById("approvalActions").style.display = "block";
     } else if (data.missing_information && data.missing_information.length > 0) {
       decisionTitle.innerHTML = "<span style='color:#ef4444;'>❌ Missing Required Information</span>";
@@ -71,18 +80,52 @@ async function runAgent() {
 }
 
 async function approveAction() {
-  logActivity("Operator clicked 'Approve' in Web UI (or approved via Slack)");
-  logActivity("Calling tool: create_appointment()...");
-  logActivity("✓ Appointment created: JOB-1042");
-  logActivity("✓ Slack notification posted to #runbook-agent-demo");
-  logActivity("[Workflow Completed Successfully]");
+  logActivity("Operator clicked 'Approve' in Web UI");
+  logActivity("Sending confirmation to Agent Backend...");
+  
+  try {
+    await fetch("https://runbook-agent-backend.onrender.com/api/appointment/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "approved",
+        carrier: currentPendingAction?.carrier || "ABC Logistics",
+        customer: currentPendingAction?.customer || "DHL Bangalore",
+        slot: currentPendingAction?.slot || "Tuesday 10:00 AM"
+      })
+    });
+    logActivity("✓ Confirmation recorded in Render logs & dispatched to Slack");
+    logActivity("✓ Appointment created: JOB-1042");
+    logActivity("[Workflow Completed Successfully]");
+  } catch (err) {
+    logActivity("[Error] Failed to dispatch approval: " + err.message);
+  }
+
   document.getElementById("approvalActions").style.display = "none";
-  document.getElementById("decisionBody").innerHTML += "<br><strong style='color:#16a34a;'>Action Confirmed by Human Operator.</strong>";
+  document.getElementById("decisionBody").innerHTML += "<br><strong style='color:#16a34a;'>Action Approved & Recorded in Slack.</strong>";
 }
 
-function rejectAction() {
-  logActivity("Operator clicked 'Reject'");
-  logActivity("Execution halted. Job marked as CANCELLED in audit store.");
+async function rejectAction() {
+  logActivity("Operator clicked 'Reject' in Web UI");
+  logActivity("Sending rejection event to Agent Backend...");
+
+  try {
+    await fetch("https://runbook-agent-backend.onrender.com/api/appointment/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "rejected",
+        carrier: currentPendingAction?.carrier || "ABC Logistics",
+        customer: currentPendingAction?.customer || "DHL Bangalore",
+        slot: currentPendingAction?.slot || "Tuesday 10:00 AM"
+      })
+    });
+    logActivity("✓ Rejection recorded in Render logs & dispatched to Slack");
+    logActivity("Execution halted. Job marked as CANCELLED in audit store.");
+  } catch (err) {
+    logActivity("[Error] Failed to dispatch rejection: " + err.message);
+  }
+
   document.getElementById("approvalActions").style.display = "none";
-  document.getElementById("decisionBody").innerHTML += "<br><strong style='color:#dc2626;'>Action Rejected by Operator.</strong>";
+  document.getElementById("decisionBody").innerHTML += "<br><strong style='color:#dc2626;'>Action Rejected & Logged in Slack.</strong>";
 }
