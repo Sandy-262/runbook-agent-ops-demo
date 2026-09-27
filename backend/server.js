@@ -145,6 +145,32 @@ async function sendSlackApproval({ customer, day, slot, carrier, confidence, rea
 }
 
 const PORT = process.env.PORT || 3000;
+// Post-Approval Route
+app.post('/api/appointment/confirm', async (req, res) => {
+  const { action, carrier, customer } = req.body;
+  const statusEmoji = action === "approved" ? "✅" : "❌";
+  const statusText = action === "approved" ? "APPROVED" : "REJECTED";
+
+  console.log(`[AUDIT] Operator ${statusText} appointment for ${customer} with ${carrier}`);
+
+  // Send update to Slack
+  const url = process.env.SLACK_WEBHOOK_URL;
+  if (url && !url.includes("YOUR/WEBHOOK")) {
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `${statusEmoji} *OPERATOR ACTION RECORDED*\n*Status:* ${statusText}\n*Facility:* ${customer}\n*Carrier:* ${carrier}\n*Timestamp:* ${new Date().toISOString()}`
+        })
+      });
+    } catch (err) {
+      console.error("Slack webhook error:", err.message);
+    }
+  }
+
+  res.json({ success: true, status: statusText });
+});
 app.listen(PORT, () => {
   console.log(`Agent backend running on port ${PORT}`);
 });
